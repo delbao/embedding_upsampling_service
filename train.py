@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import layers, losses, models, optimizers
+from tensorflow.keras import layers, models
+from tensorflow.keras.callbacks import EarlyStopping
 
 from common import cosine_similarity_loss
 
@@ -36,9 +37,12 @@ print("Shape of y_train_indices:", y_train_indices.shape)
 model.compile(optimizer='adam', loss=cosine_similarity_loss(
     cosine_angle_similarity_matrix))
 
-# Train the model using X_train and y_train_indices
+# Create an early stopping callback
+early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=1, restore_best_weights=True)
+
+# Modify your fit function to include the early stopping callback
 history = model.fit(X_train, y_train_indices, epochs=100,
-                    batch_size=30, validation_split=0.2)
+                    batch_size=30, validation_split=0.2, callbacks=[early_stopping])
 
 # Save the trained model
 model.save("./trained")
